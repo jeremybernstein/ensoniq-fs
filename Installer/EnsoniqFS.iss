@@ -28,6 +28,9 @@ Source: "..\ensoniqfs\README"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Ensoniq Filesystem Tools"; Filename: "{app}\ETools.exe"
+Name: "{group}\License"; Filename: "{app}\LICENSE"
+Name: "{group}\Readme"; Filename: "{app}\README"
+Name: "{group}\Credits"; Filename: "{app}\CREDITS"
 Name: "{group}\{cm:ProgramOnTheWeb,EnsoniqFS}"; Filename: "http://sourceforge.net/projects/ensoniqfs/"
 Name: "{group}\{cm:UninstallProgram,EnsoniqFS}"; Filename: "{uninstallexe}"
 

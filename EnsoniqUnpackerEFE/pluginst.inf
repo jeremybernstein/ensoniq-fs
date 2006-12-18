@@ -1,0 +1,6 @@
+[plugininstall]
+description=Ensoniq instrument unpacker plugin
+type=wcx
+file=EnsoniqUnpackerEFE.wcx
+defaultextension=efe
+defaultdir=EnsoniqUnpackerEFE

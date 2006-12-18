@@ -1,0 +1,6 @@
+[plugininstall]
+description=Ensoniq disk image unpacker plugin
+type=wcx
+file=EnsoniqUnpacker.wcx
+defaultextension=ede,eda,edt,gkh
+defaultdir=EnsoniqUnpacker

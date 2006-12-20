@@ -1,7 +1,7 @@
 [Project]
 FileName=EnsoniqUnpackerEFE.dev
 Name=EnsoniqUnpackerEFE
-UnitCount=4
+UnitCount=6
 Type=3
 Ver=1
 ObjFiles=
@@ -78,11 +78,11 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit5]
-FileName=EnsoniqInstrument.h
+FileName=LICENSE
 CompileCpp=0
-Folder=
-Compile=1
-Link=1
+Folder=EnsoniqUnpackerEFE
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
@@ -93,6 +93,15 @@ CompileCpp=0
 Folder=
 Compile=1
 Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit6]
+FileName=CREDITS
+Folder=EnsoniqUnpackerEFE
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=

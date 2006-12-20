@@ -125,23 +125,42 @@ version may be available via "http://www.thoralt.de/projects/ensoniqunpacker/".
 6 License
 ---------
 
-Everyone is allowed to use, abuse and distribute this software freely except
-for commercial use. If you distribute this software, the author has to be
-named clearly. This software MUST NOT be sold without written permisson
-of the author. The source code may be freely modified, but the original author
-must be clearly stated (give credits!). If you modify the source code, please
-let me know about it, I possibly want to integrate your changes into the
-official version.
+The project is published under the GNU GENERAL PUBLIC LICENSE (GPL) v2. Please
+read the LICENSE file for further information.
 
 
 7 Disclaimer
 ------------
 
-This software is provided "as is". Although the author tested the software,
-there is no warranty of merchantability and fitness for a particular purpose.
-Use the software at your own risk. The author is not responsible for any
-damage to your person, your equipment or your data arising out of the use of
-this software.
+Although being constantly under test and development, this software might
+contain bugs which, in worst case, do damage to your data. Please keep backups
+every time (use ETools for easy backup)!
+
+The next two paragraphs were copied from the GPL (see also the LICENSE file):
+	
+	NO WARRANTY
+
+	BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+	FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+	OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+	PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+	OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+	TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
+	PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
+	REPAIR OR CORRECTION.
+	
+	IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+	WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+	REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+	INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+	OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
+	TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+	YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+	PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGES.
+
+Please keep that in mind when using this software.
 
 
 8 History

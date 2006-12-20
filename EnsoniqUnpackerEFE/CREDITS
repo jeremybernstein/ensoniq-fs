@@ -1,0 +1,17 @@
+-------
+CREDITS
+-------
+
+Total Commander (c) Christian Ghisler
+http://www.ghisler.com
+
+Developers on EnsoniqUnpacker plugin:
+Thoralt Franz
+
+Jan Petersson: Intensive testing
+
+Michael Chen: Instrument structure documentation
+
+Special thanks go to Gary Giebler for his detailed description of the Ensoniq
+diskette format. Whithout these details this project wouldn't have been
+possible.

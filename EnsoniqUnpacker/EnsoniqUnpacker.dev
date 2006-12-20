@@ -1,7 +1,7 @@
 [Project]
 FileName=EnsoniqUnpacker.dev
 Name=EnsoniqUnpacker
-UnitCount=4
+UnitCount=6
 Type=3
 Ver=1
 ObjFiles=
@@ -79,6 +79,24 @@ BuildCmd=
 
 [Unit4]
 FileName=readme.txt
+Folder=EnsoniqUnpacker
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit5]
+FileName=LICENSE
+Folder=EnsoniqUnpacker
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit6]
+FileName=CREDITS
 Folder=EnsoniqUnpacker
 Compile=0
 Link=0

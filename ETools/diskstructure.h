@@ -3,12 +3,6 @@
 
 #include <winioctl.h>
 
-//############################################################################
-// This is actually a part of "EnsoniqFS.h"
-// It isn't included via #include because you'll get lots of linker errors
-// and I wasn't able to fix them (even with using extern "C").
-//############################################################################
-
 // some definitions which are missing for some reason in Visual Studio 6
 // (maybe I'll need another service pack :))
 #ifdef _MSC_VER

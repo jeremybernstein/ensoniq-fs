@@ -13,11 +13,9 @@
 
 #include "diskstructure.h"
 
-//############################################################################
-// End of "EnsoniqFS.h"
-//############################################################################
-
-
+//----------------------------------------------------------------------------
+// external DLL functions
+//----------------------------------------------------------------------------
 typedef void (__stdcall *tFreeDiskList)(int iShowProgress, DISK *pRoot);
 typedef int (__stdcall *tCacheFlush)(DISK *pDisk);
 typedef int (__stdcall *tReadBlocks)(DISK *pDisk, DWORD dwBlock,
@@ -40,6 +38,9 @@ class CEToolsDlg : public CDialog
 {
 // Konstruktion
 public:
+	int SetFATEntryRAM(unsigned char *ucFAT, int iBlock, int iNewValue);
+	int GetFATEntryRAM(unsigned char *ucFAT, int iBlock);
+	CString CapacityString(int iDiskCapacity);
 	CString SearchRecursive(CString csWhat, CString csWhere);
 	void LOG(CString cs);
 	CString GetErrorText(DWORD dwError);
@@ -83,8 +84,6 @@ protected:
 	int m_iMaxLogicalBlocks, m_iMaxPhysicalBlocks, m_iFiles, m_iDirectories, 
 		m_iTempDirectories;
 	int MarkUsedBlocks(DISK *pDisk, int iDirectoryBlock, unsigned char *ucFAT);
-	int SetFATEntryRAM(unsigned char *ucFAT, int iBlock, int iNewValue);
-	int GetFATEntryRAM(unsigned char *ucFAT, int iBlock);
 	void AddStatus(CString csStatus);
 	void ShowCancel(BOOL bShow);
 	void UpdateDeviceDropdown();

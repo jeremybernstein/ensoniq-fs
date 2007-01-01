@@ -92,6 +92,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\BackupOptionsDlg.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ETools.cpp
 # End Source File
 # Begin Source File
@@ -115,6 +119,10 @@ SOURCE=.\StdAfx.cpp
 # Begin Group "Header-Dateien"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\BackupOptionsDlg.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\diskstructure.h

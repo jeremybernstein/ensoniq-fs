@@ -7,6 +7,7 @@
 #include "ETools.h"
 #include "EToolsDlg.h"
 #include "FormatDlg.h"
+#include "BackupOptionsDlg.h"
 #include "../EnsoniqFS/error.h"
 
 #ifdef _DEBUG
@@ -291,15 +292,15 @@ void CEToolsDlg::OnButtonBackup()
 {
 #define BUF_SIZE 512*128
 
-	static char BASED_CODE szFilter[] = "ISO images (*.iso)|*.iso|"
-										"All Files (*.*)|*.*||";
-	CString csDevice, csFN, csTemp, csSpeed, csTime;
-	unsigned char ucBuf[BUF_SIZE];
-	DISK *pDisk = NULL;
-	CFileDialog *dlg;
-	int iBlock, i, iMaxBlocks, iBlocksToRead, iSpeed, iLastBlock, iResult;
-	HANDLE h;
+	int iBlock, i, iMaxBlocks, iBlocksToRead, iSpeed, iLastBlock, iResult,
+		iBackupFormat;
 	DWORD dwTime, dwLastTime, dwBytesWritten, dwError;
+	CString csDevice, csTemp, csSpeed, csTime;
+	unsigned char ucBuf[BUF_SIZE];
+	char cFN[MAX_PATH+1];
+	DISK *pDisk = NULL;
+	HANDLE h;
+
 
 	// check function pointers
 	if(NULL==this->ReadBlocks) return;
@@ -355,15 +356,39 @@ void CEToolsDlg::OnButtonBackup()
 		return;
 	}
 
-	// show "Save as..." dialog
- 	dlg = new CFileDialog(FALSE, "iso", "c:\\imagefile.iso", 
-		OFN_OVERWRITEPROMPT, szFilter, this);
-	if(NULL==dlg) return;
-	if(IDCANCEL==dlg->DoModal()) return;
-	csFN = dlg->GetPathName();
+	CBackupOptionsDlg *dlg;
+	dlg = new CBackupOptionsDlg();
+	dlg->SetReturnValuePointers(&iBackupFormat, cFN, this, pDisk);
+	if(IDCANCEL==dlg->DoModal())
+	{
+		delete dlg;
+		return;
+	}
 	delete dlg;
 
-	h = CreateFile(csFN, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
+	if(BACKUP_FILES==iBackupFormat)
+	{
+		if(IDNO==MessageBox("Before backing up a drive with the "
+			"\"files only\" method it is recommended\n"
+			"to run a filesystem check. Otherwise, possibly not "
+			"all files will be processed.\n\n"
+			"Do you want to continue?",
+			"Ensoniq Filesystem Tools · Warning", 
+			MB_ICONEXCLAMATION | MB_YESNO))
+		{
+			return;
+		}
+	}
+	else if(BACKUP_PARTITION==iBackupFormat) iMaxBlocks = pDisk->dwBlocks;
+	else iMaxBlocks = (int)(pDisk->DiskGeometry.DiskSize.QuadPart/512);
+
+	if(BACKUP_FILES==iBackupFormat)
+	{
+		MessageBox("BACKUP_FILES currently not supported");
+		return;
+	}
+
+	h = CreateFile(cFN, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 0, 0);
 	if(INVALID_HANDLE_VALUE==h)
 	{
 		dwError = GetLastError();
@@ -376,101 +401,107 @@ void CEToolsDlg::OnButtonBackup()
 	}
 
 	m_ctlStaticStatus.SetWindowText("Reading disk, writing to image...");
-
 	iBlock = 0; m_bWorking = TRUE;
-	iMaxBlocks = (int)(pDisk->DiskGeometry.DiskSize.QuadPart/512);
 	m_bCancel = FALSE; ShowCancel(TRUE);
 	dwTime = GetTickCount(); dwLastTime = dwTime;
 
-	// read all blocks from device
-	while(iBlock<iMaxBlocks)
+	if(BACKUP_FILES==iBackupFormat)
 	{
-		iBlocksToRead = 128;
-		if((iMaxBlocks-iBlock)<128) iBlocksToRead = iMaxBlocks-iBlock;
-
-		// read blocks
-		if(ERR_OK!=ReadBlocks(pDisk, iBlock, iBlocksToRead, ucBuf))
+		MessageBox("BACKUP_FILES currently not supported");
+		return;
+	}
+	else
+	{
+		// read all blocks from device
+		while(iBlock<iMaxBlocks)
 		{
-			MessageBox("Error reading from device.",
-				"Ensoniq Filesystem Tools · Warning", 
-				MB_ICONEXCLAMATION | MB_OK);
-			m_ctlStaticStatus.SetWindowText("Error reading from device.");
-			CloseHandle(h);
-			ShowCancel(FALSE);
-			m_bWorking = FALSE;
-			return;
-		}
+			iBlocksToRead = 128;
+			if((iMaxBlocks-iBlock)<128) iBlocksToRead = iMaxBlocks-iBlock;
 
-		// write blocks
-		iResult = WriteFile(h, ucBuf, iBlocksToRead*512, &dwBytesWritten, 0);
-		if((512*iBlocksToRead!=(int)dwBytesWritten)||(iResult==0))
-		{
-			MessageBox("Error writing to destination file.",
-				"Ensoniq Filesystem Tools · Warning", 
-				MB_ICONEXCLAMATION | MB_OK);
-			CloseHandle(h);
-			m_ctlStaticStatus.SetWindowText("Error writing to "
-				"destination file.");
-			ShowCancel(FALSE);
-			m_bWorking = FALSE;
-			return;
-		}
-
-		// set progress bar
-		iBlock += iBlocksToRead;
-		m_ctlProgress.SetPos(iBlock*100/iMaxBlocks);
-
-		if(GetTickCount()>(dwLastTime+1000))
-		{
-			if((GetTickCount()-dwLastTime)>0)
+			// read blocks
+			if(ERR_OK!=ReadBlocks(pDisk, iBlock, iBlocksToRead, ucBuf))
 			{
-				iSpeed = iBlock/2 - iLastBlock/2;
-				iSpeed *= 1000;
-				iSpeed /= GetTickCount()-dwLastTime;
-				csSpeed.Format("%i", iSpeed);
-				if(iSpeed>=1)
-				{
-					csTime.Format("%02i:%02i:%02i", 
-						(((iMaxBlocks-iBlock)/2)/iSpeed)/3600,
-						((((iMaxBlocks-iBlock)/2)/iSpeed)%3600)/60,
-						(((iMaxBlocks-iBlock)/2)/iSpeed)%60);
-				}
-				else csTime = "---";
-			}
-			else
-			{
-				csSpeed = "---";
-				csTime = "---";
-			}
-
-			csTemp.Format("Reading disk, writing to image...\n\n"
-				"%i %% done (%i kB of %i kB), %s kB/sec, "
-				"estimated time left: %s",
-				iBlock*100/iMaxBlocks, iBlock/2, iMaxBlocks/2, csSpeed,
-				csTime);
-
-			m_ctlStaticStatus.SetWindowText(csTemp);
-			dwLastTime = GetTickCount();
-			iLastBlock = iBlock;
-		}
-
-		Pump();
-
-		if(m_bCancel)
-		{
-			if(IDYES==MessageBox("Do you want to cancel the operation?",
-				"Ensoniq Filesystem Tools",
-				MB_ICONQUESTION | MB_YESNO))
-			{
-				m_ctlStaticStatus.SetWindowText("Backup cancelled.");
+				MessageBox("Error reading from device.",
+					"Ensoniq Filesystem Tools · Warning", 
+					MB_ICONEXCLAMATION | MB_OK);
+				m_ctlStaticStatus.SetWindowText("Error reading from device.");
 				CloseHandle(h);
 				ShowCancel(FALSE);
 				m_bWorking = FALSE;
 				return;
 			}
-			else
+
+			// write blocks
+			iResult = WriteFile(h, ucBuf, iBlocksToRead*512, &dwBytesWritten, 0);
+			if((512*iBlocksToRead!=(int)dwBytesWritten)||(iResult==0))
 			{
-				m_bCancel = FALSE;
+				MessageBox("Error writing to destination file.",
+					"Ensoniq Filesystem Tools · Warning", 
+					MB_ICONEXCLAMATION | MB_OK);
+				CloseHandle(h);
+				m_ctlStaticStatus.SetWindowText("Error writing to "
+					"destination file.");
+				ShowCancel(FALSE);
+				m_bWorking = FALSE;
+				return;
+			}
+
+			// set progress bar
+			iBlock += iBlocksToRead;
+			m_ctlProgress.SetPos(iBlock*100/iMaxBlocks);
+
+			if(GetTickCount()>(dwLastTime+1000))
+			{
+				if((GetTickCount()-dwLastTime)>0)
+				{
+					iSpeed = iBlock/2 - iLastBlock/2;
+					iSpeed *= 1000;
+					iSpeed /= GetTickCount()-dwLastTime;
+					csSpeed.Format("%i", iSpeed);
+					if(iSpeed>=1)
+					{
+						csTime.Format("%02i:%02i:%02i", 
+							(((iMaxBlocks-iBlock)/2)/iSpeed)/3600,
+							((((iMaxBlocks-iBlock)/2)/iSpeed)%3600)/60,
+							(((iMaxBlocks-iBlock)/2)/iSpeed)%60);
+					}
+					else csTime = "---";
+				}
+				else
+				{
+					csSpeed = "---";
+					csTime = "---";
+				}
+
+				csTemp.Format("Reading disk, writing to image...\n\n"
+					"%i %% done (%i kB of %i kB), %s kB/sec, "
+					"estimated time left: %s",
+					iBlock*100/iMaxBlocks, iBlock/2, iMaxBlocks/2, csSpeed,
+					csTime);
+
+				m_ctlStaticStatus.SetWindowText(csTemp);
+				dwLastTime = GetTickCount();
+				iLastBlock = iBlock;
+			}
+
+			Pump();
+
+			if(m_bCancel)
+			{
+				if(IDYES==MessageBox("Do you want to cancel the operation?",
+					"Ensoniq Filesystem Tools",
+					MB_ICONQUESTION | MB_YESNO))
+				{
+					m_ctlStaticStatus.SetWindowText("Backup cancelled.");
+					CloseHandle(h);
+					ShowCancel(FALSE);
+					m_bWorking = FALSE;
+					return;
+				}
+				else
+				{
+					m_bCancel = FALSE;
+				}
 			}
 		}
 	}
@@ -1042,6 +1073,8 @@ void CEToolsDlg::OnButtonCheckfs()
 	memcpy(ucFATCopy, ucFAT, iFATSize*512);
 
 	// test FAT integrity
+	AddStatus("OK.\nChecking FAT integrity: ");
+	iResult = 0;
 	for(i=0; i<iFATSize; i++)
 	{
 		if((ucFAT[i*512+510]!='F')||(ucFAT[i*512+511]!='B'))
@@ -1071,10 +1104,18 @@ void CEToolsDlg::OnButtonCheckfs()
 			MessageBox(csTemp, "Ensoniq Filesystem Tools · Warning", 
 				MB_ICONEXCLAMATION);
 
-			iFATSize = i;
+			iFATSize = i; iResult = 1;
 			m_iMaxLogicalBlocks = iFATSize * 170;
 			break;
 		}
+	}
+	if(iResult)
+	{
+		AddStatus("failed.\n");
+	}
+	else
+	{
+		AddStatus("OK.\n");
 	}
 
 	//........................................................................
@@ -1084,7 +1125,7 @@ void CEToolsDlg::OnButtonCheckfs()
 	// mark all used blocks recursively starting with
 	// block 3 (root directory)
 	m_iFiles = 0; m_iDirectories = 1;
-	AddStatus("OK.\nReading file structure: ROOT");
+	AddStatus("Reading file structure: ROOT");
 	if(ERR_OK!=MarkUsedBlocks(pDisk, 3, ucFATCopy))
 	{
 		AddStatus("?Reading file structure: failed.\n");
@@ -1502,7 +1543,6 @@ void CEToolsDlg::UpdateDeviceDropdown()
 	LOG("UpdateDeviceDropdown(): begin\n");
 
 	CString csDiskName, csDiskLabel, csDiskSize;
-	double dDiskSize;
 	DISK *pDisk;
 
 	if(NULL==this->ScanDevices) return;
@@ -1550,24 +1590,8 @@ void CEToolsDlg::UpdateDeviceDropdown()
 		LOG("OK.\nCalculating disk size: ");
 
 		// calculate disk size
-		dDiskSize = (int)(pDisk->DiskGeometry.DiskSize.QuadPart/1024);
-		if(dDiskSize>1024)
-		{
-			dDiskSize /= 1024;
-			if(dDiskSize>1024)
-			{
-				dDiskSize /= 1024;
-				csDiskSize.Format("%.1f GB", dDiskSize);
-			}
-			else
-			{
-				csDiskSize.Format("%.1f MB", dDiskSize);
-			}
-		}
-		else
-		{
-			csDiskSize.Format("%.1f kB", dDiskSize);
-		}
+		csDiskSize = 
+			CapacityString((int)(pDisk->DiskGeometry.DiskSize.QuadPart/1024));
 		
 		csDiskName.Format("%s: %s (%s)", pDisk->cMsDosName, csDiskLabel,
 			csDiskSize);
@@ -2112,6 +2136,40 @@ CString CEToolsDlg::GetErrorText(DWORD dwError)
 	LocalFree(lpMsgBuf);
 
 	return csErr;
+}
+
+//----------------------------------------------------------------------------
+// CapacityString
+// 
+// Formats a string to contain a capacity value (kB, MB, GB)
+// 
+// -> iDiskCapacity = capacity in kBytes
+// <- formatted string
+//----------------------------------------------------------------------------
+CString CEToolsDlg::CapacityString(int iDiskCapacity)
+{
+	CString csDiskSize;
+	double dDiskSize = iDiskCapacity;
+
+	if(dDiskSize>1024)
+	{
+		dDiskSize /= 1024;
+		if(dDiskSize>1024)
+		{
+			dDiskSize /= 1024;
+			csDiskSize.Format("%.1f GB", dDiskSize);
+		}
+		else
+		{
+			csDiskSize.Format("%.1f MB", dDiskSize);
+		}
+	}
+	else
+	{
+		csDiskSize.Format("%.1f kB", dDiskSize);
+	}
+
+	return csDiskSize;
 }
 
 /*

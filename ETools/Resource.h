@@ -10,6 +10,7 @@
 #define IDD_ETOOLS_DIALOG               102
 #define IDR_MAINFRAME                   128
 #define IDD_DLG_FORMAT                  129
+#define IDD_DLG_BACKUP_OPTIONS          132
 #define IDC_PROGRESS                    1000
 #define IDC_STATIC_STATUS               1001
 #define IDC_BUTTON_BACKUP               1002
@@ -24,14 +25,18 @@
 #define IDC_EDIT_DISK_LABEL             1011
 #define IDC_PROGRESS_FORMAT             1012
 #define IDC_STATIC_MAX_CAPACITY         1014
+#define IDC_STATIC_INFO                 1018
+#define IDC_EDIT_FN                     1019
+#define IDC_BUTTON_BROWSE               1020
+#define IDC_COMBO_BACKUP_FORMAT         1021
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_RESOURCE_VALUE        134
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1023
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

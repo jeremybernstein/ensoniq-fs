@@ -97,6 +97,24 @@ BEGIN
     LTEXT           "1600 kB max.",IDC_STATIC_MAX_CAPACITY,117,20,69,8
 END
 
+IDD_DLG_BACKUP_OPTIONS DIALOG DISCARDABLE  0, 0, 271, 105
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Backup options"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_COMBO_BACKUP_FORMAT,15,18,111,93,CBS_DROPDOWNLIST | 
+                    NOT WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_FN,15,58,220,12,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_BUTTON_BROWSE,240,58,15,12
+    PUSHBUTTON      "&Cancel",IDCANCEL,155,84,50,14
+    DEFPUSHBUTTON   "&Start Backup",IDOK,214,84,50,14
+    GROUPBOX        "Options",IDC_STATIC,7,7,257,35
+    GROUPBOX        "Filename",IDC_STATIC,7,45,257,32
+    LTEXT           "Info",IDC_STATIC_INFO,130,18,125,20
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,
+                    15,17,109,9
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -117,6 +135,16 @@ BEGIN
         HORZGUIDE, 30
         HORZGUIDE, 64
     END
+
+    IDD_DLG_BACKUP_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 264
+        VERTGUIDE, 15
+        VERTGUIDE, 255
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -136,6 +164,20 @@ BEGIN
 0x424d, "\000" 
     IDC_COMBO_UNIT, 0x403, 3, 0
 0x4247, "\000" 
+    0
+END
+
+IDD_DLG_BACKUP_OPTIONS DLGINIT
+BEGIN
+    IDC_COMBO_BACKUP_FORMAT, 0x403, 28, 0
+0x7546, 0x6c6c, 0x6220, 0x6361, 0x756b, 0x2070, 0x7028, 0x7968, 0x6973, 
+0x6163, 0x206c, 0x6973, 0x657a, 0x0029, 
+    IDC_COMBO_BACKUP_FORMAT, 0x403, 32, 0
+0x6150, 0x7472, 0x7469, 0x6f69, 0x206e, 0x6162, 0x6b63, 0x7075, 0x2820, 
+0x6f6c, 0x6967, 0x6163, 0x206c, 0x6973, 0x657a, 0x0029, 
+    IDC_COMBO_BACKUP_FORMAT, 0x403, 26, 0
+0x6946, 0x656c, 0x2073, 0x6e6f, 0x796c, 0x2820, 0x696d, 0x696e, 0x756d, 
+0x206d, 0x6973, 0x657a, 0x0029, 
     0
 END
 
@@ -168,30 +210,67 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
 
-IDD_ETOOLS_DIALOG DIALOGEX 0, 0, 342, 260
+IDD_ETOOLS_DIALOG DIALOGEX 0, 0, 342, 305
 STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "Ensoniq Filesystem Tools"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,227,239,50,14,NOT WS_VISIBLE | WS_DISABLED
-    PUSHBUTTON      "&Exit",IDCANCEL,285,239,50,14
-    GROUPBOX        "Status",IDC_STATIC,7,68,328,137
-    GROUPBOX        "Command",IDC_STATIC,7,7,328,59
+    DEFPUSHBUTTON   "OK",IDOK,227,284,50,14,NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "&Exit",IDCANCEL,285,284,50,14
+    GROUPBOX        "Status",IDC_STATIC,7,104,328,148
+    GROUPBOX        "Command",IDC_STATIC,7,7,328,96
     CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",PBS_SMOOTH | 
-                    WS_BORDER,13,218,315,8
+                    WS_BORDER,13,264,315,8
     LTEXT           "Ensoniq Filesystem Tools ready.",IDC_STATIC_STATUS,13,
-                    80,315,117
-    PUSHBUTTON      "&Backup Disk",IDC_BUTTON_BACKUP,13,43,50,13
-    PUSHBUTTON      "&Restore Disk",IDC_BUTTON_RESTORE,68,43,50,13
-    PUSHBUTTON      "&Check Disk",IDC_BUTTON_CHECKFS,122,43,50,13
-    PUSHBUTTON      "&Format Disk",IDC_BUTTON_FORMAT,176,43,50,13
+                    114,315,132
+    PUSHBUTTON      "&Backup Disk",IDC_BUTTON_BACKUP,13,38,50,13
+    PUSHBUTTON      "&Restore Disk",IDC_BUTTON_RESTORE,13,52,50,13
+    PUSHBUTTON      "&Check Disk",IDC_BUTTON_CHECKFS,13,67,50,13
+    PUSHBUTTON      "&Format Disk",IDC_BUTTON_FORMAT,13,82,50,13
     COMBOBOX        IDC_COMBO_DEVICES,13,21,315,180,CBS_DROPDOWNLIST | 
                     CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Progress",IDC_STATIC,7,207,328,27
-    PUSHBUTTON      "Cancel operation",IDC_BUTTON_CANCEL,7,239,110,14,NOT 
+    GROUPBOX        "Progress",IDC_STATIC,7,253,328,27
+    PUSHBUTTON      "Cancel operation",IDC_BUTTON_CANCEL,7,284,110,14,NOT 
                     WS_VISIBLE
+    LTEXT           "Creates an ISO image of the above selected disk",
+                    IDC_STATIC,70,40,258,11
+    LTEXT           "Performs filesystem checks on above selected disk and repairs errors if needed",
+                    IDC_STATIC,70,69,258,11
+    LTEXT           "Restores an ISO image to the above selected disk",
+                    IDC_STATIC,70,54,258,11
+    LTEXT           "Formats the above selected disk to an arbitrary size ",
+                    IDC_STATIC,70,84,258,11
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_ETOOLS_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 335
+        VERTGUIDE, 13
+        VERTGUIDE, 328
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 298
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 #ifndef _MAC
@@ -235,35 +314,6 @@ BEGIN
 END
 
 #endif    // !_MAC
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
-BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 228
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 48
-    END
-
-    IDD_ETOOLS_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 335
-        VERTGUIDE, 13
-        VERTGUIDE, 328
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 253
-    END
-END
-#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////

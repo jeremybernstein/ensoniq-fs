@@ -111,7 +111,8 @@ void CEnsoniqBankListerDlg::OnOK()
 	static char BASED_CODE szFilter[] = "Ensoniq files (*.efe)|*.efe|"
 										"All Files (*.*)|*.*||";
 	CString csFN, csText, csTemp;
-	int i, j, iFileSize, iType, iVolumeTableOffset, iPanningTableOffset;
+	int i, j, iFileSize, iType, iVolumeTableOffset, iPanningTableOffset,
+		iInfoBlockSize;
 	unsigned char *ucBuf;
 	CFileDialog *dlg;
 	char c;
@@ -184,27 +185,27 @@ void CEnsoniqBankListerDlg::OnOK()
 		(0xFF==ucBuf[6])&&(0xC0==ucBuf[7]))
 	{
 		csTemp = "EPS";
-		iType = TYPE_EPS;
+		iType = TYPE_EPS; iInfoBlockSize = 16;
 		iVolumeTableOffset = 0x00b2; iPanningTableOffset = 0x00c2;
 	}
 	else if((0xA8==ucBuf[4])&&(0x20==ucBuf[5])&&
 		(0x00==ucBuf[6])&&(0x00==ucBuf[7]))
 	{
 		csTemp = "EPS16+";
-		iType = TYPE_EPS16;
+		iType = TYPE_EPS16; iInfoBlockSize = 16;
 		iVolumeTableOffset = 0x00b2; iPanningTableOffset = 0x00c2;
 	}
 	else if((0x34==ucBuf[4])&&(0xC0==ucBuf[5])&&
 		(0x00==ucBuf[6])&&(0x00==ucBuf[7]))
 	{
 		csTemp = "ASR";
-		iType = TYPE_ASR; 
+		iType = TYPE_ASR;  iInfoBlockSize = 28;
 		iVolumeTableOffset = 0x011e; iPanningTableOffset = 0x013e;
 	}
 	else
 	{
 		csTemp = "unknown";
-		iType = TYPE_UNKNOWN;
+		iType = TYPE_UNKNOWN; iInfoBlockSize = 0;
 		iVolumeTableOffset = 0x0000; iPanningTableOffset = 0x0000;
 	}
 
@@ -240,91 +241,82 @@ void CEnsoniqBankListerDlg::OnOK()
 	m_ctlEditDetails.GetWindowText(csTemp); csTemp += csText;
 	m_ctlEditDetails.SetWindowText(csTemp);
 
-	if(TYPE_ASR!=iType)
+	// file info blocks
+	for(i=0; i<9; i++)
 	{
-		// EPS/EPS16+ file info blocks
-		for(i=0; i<9; i++)
-		{
-			// output hex bytes
-			csText.Format("\r\n16 0x%04X:", i*16+0x22);
-			for(j=0; j<16; j++)
-			{
-				csText.Format("%s %02X", csText, ucBuf[i*16+0x22+j]);
-			}
-
-			// decode disk name
-			csTemp = ""; for(j=0; j<7; j++) csTemp += ucBuf[i*16+0x22+3+j*2];
-
-			// is this an instrument?
-			if(0==(ucBuf[i*16+0x22]&0x80))
-			{
-				csText.Format("%s | file %i, disk \"%s\", location",
-					csText, i, csTemp);
-				switch(ucBuf[i*16+0x24])
-				{
-					case 0:
-						csText += " floppy"; break;
-					case 1:
-						csText += " SCSI0"; break;
-					case 2:
-						csText += " SCSI1"; break;
-					case 3:
-						csText += " SCSI2"; break;
-					case 4:
-						csText += " SCSI3"; break;
-					case 5:
-						csText += " SCSI4"; break;
-					case 6:
-						csText += " SCSI5"; break;
-					case 7:
-						csText += " SCSI6"; break;
-					case 8:
-						csText += " SCSI7"; break;
-					default:
-						csText += " unknown"; break;
-				}
-
-				for(j=0; j<6; j++)
-				{
-					csText.Format("%s %02X", csText, ucBuf[i*16+0x22+4+j*2]);
-				}
-			}
-			else // this is a copy
-			{
-				csText.Format("%s | file %i, copy of track %i", 
-					csText, i, ucBuf[i*16+0x22]&7);
-			}
-			m_ctlEditDetails.GetWindowText(csTemp); csTemp += csText;
-			m_ctlEditDetails.SetWindowText(csTemp);
-		}
-	}
-	else
-	{
-		// ASR file info blocks
-	
-		for(i=0; i<15; i++)
-		{
-			// output hex bytes
-			csText.Format("\r\n16 0x%04X:", i*16+0x22); csTemp = "";
-			for(j=0; j<16; j++)
-			{
-				csText.Format("%s %02X", csText, ucBuf[i*16+0x22+j]);
-				if(ucBuf[i*16+0x22+j]>31) csTemp += ucBuf[i*16+0x22+j];
-				else csTemp += " ";
-			}
-			csText.Format("%s | \"%s\" (unknown ASR file info blocks)",
-				csText, csTemp);
-			m_ctlEditDetails.GetWindowText(csTemp); csTemp += csText;
-			m_ctlEditDetails.SetWindowText(csTemp);
-		}
-
 		// output hex bytes
-		csText.Format("\r\n12 0x%04X:", i*16+0x22);
-		for(j=0; j<12; j++)
+		csText.Format("\r\n16 0x%04X:", i*iInfoBlockSize+0x22);
+		for(j=0; j<16; j++)
 		{
-			csText.Format("%s %02X", csText, ucBuf[i*16+0x22+j]);
+			csText.Format("%s %02X", csText, ucBuf[i*iInfoBlockSize+0x22+j]);
 		}
-		csText += "             | ASR file info blocks (unknown)";
+
+		// decode disk name
+		csTemp = ""; for(j=0; j<7; j++) csTemp += ucBuf[i*iInfoBlockSize+0x22+3+j*2];
+
+		// is this an instrument or copy?
+		if(0==(ucBuf[i*iInfoBlockSize+0x22]&0x80))
+		{
+			csText.Format("%s | file %i, disk \"%s\", location",
+				csText, i, csTemp);
+			switch(ucBuf[i*iInfoBlockSize+0x24])
+			{
+				case 0:
+					csText += " floppy"; break;
+				case 1:
+					csText += " SCSI0"; break;
+				case 2:
+					csText += " SCSI1"; break;
+				case 3:
+					csText += " SCSI2"; break;
+				case 4:
+					csText += " SCSI3"; break;
+				case 5:
+					csText += " SCSI4"; break;
+				case 6:
+					csText += " SCSI5"; break;
+				case 7:
+					csText += " SCSI6"; break;
+				case 8:
+					csText += " SCSI7"; break;
+				default:
+					csText += " unknown"; break;
+			}
+
+			for(j=0; j<6; j++)
+			{
+				csText.Format("%s %02X", csText, 
+					ucBuf[i*iInfoBlockSize+0x22+4+j*2]);
+			}
+
+			// for ASR, output 6 more
+			if(TYPE_ASR==iType)
+			{
+				for(j=6; j<12; j++)
+				{
+					csText.Format("%s %02X", csText, 
+						ucBuf[i*iInfoBlockSize+0x22+4+j*2]);
+				}
+			}
+		}
+		else // this is a copy
+		{
+			csText.Format("%s | file %i, copy of track %i", 
+				csText, i, ucBuf[i*iInfoBlockSize+0x22]&7);
+		}
+
+		// output additional ASR data
+		if(TYPE_ASR==iType)
+		{
+			csText.Format("%s\r\n12 0x%04X:", csText, i*iInfoBlockSize+0x32);
+			for(j=0; j<12; j++)
+			{
+				csText.Format("%s %02X", csText, 
+					ucBuf[i*iInfoBlockSize+0x32+j]);
+			}
+			csText +="             |";
+		}
+
 		m_ctlEditDetails.GetWindowText(csTemp); csTemp += csText;
 		m_ctlEditDetails.SetWindowText(csTemp);
 	}

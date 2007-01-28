@@ -1542,7 +1542,7 @@ void CEToolsDlg::UpdateDeviceDropdown()
 	LOG("--------------------------------------------------------------\n");
 	LOG("UpdateDeviceDropdown(): begin\n");
 
-	CString csDiskName, csDiskLabel, csDiskSize;
+	CString csDiskName, csDiskLabel, csDiskSize, csPartitionSize, csName;
 	DISK *pDisk;
 
 	if(NULL==this->ScanDevices) return;
@@ -1577,6 +1577,13 @@ void CEToolsDlg::UpdateDeviceDropdown()
 	{
 		LOG("Looping through disk list: next item.\nGetting disk label: ");
 
+		// get disk name
+		csName.Format("%s", pDisk->cMsDosName);
+		if(csName.GetLength()>63)
+		{
+			csName = csName.Left(30) + "..." + csName.Right(30);
+		}
+
 		// get disk label
 		if(pDisk->iIsEnsoniq)
 		{
@@ -1592,9 +1599,9 @@ void CEToolsDlg::UpdateDeviceDropdown()
 		// calculate disk size
 		csDiskSize = 
 			CapacityString((int)(pDisk->DiskGeometry.DiskSize.QuadPart/1024));
-		
-		csDiskName.Format("%s: %s (%s)", pDisk->cMsDosName, csDiskLabel,
-			csDiskSize);
+		csPartitionSize = CapacityString((int)(pDisk->dwBlocks)/2);
+		csDiskName.Format("%s: %s (%s disk, %s partition)", 
+			csName, csDiskLabel, csDiskSize, csPartitionSize);
 
 		LOG("OK.\nAdding to list ("); LOG(csDiskName);
 		LOG("): ");
@@ -1954,7 +1961,7 @@ int CEToolsDlg::CheckParentLinks(DISK *pDisk, BOOL bRepair, int iDir,
 					csTemp = "PARENTDIR   ";
 					for(j=0; j<12; j++) ucBuf[2+j] = csTemp[j];
 					ucBuf[14] = 0x00;
-					ucBuf[15] = 0x02; // file size
+					ucBuf[15] = 0x00; // file size
 					ucBuf[16] = 0x00;
 					ucBuf[17] = 0x02; // contiguous blocks
 					ucBuf[18] = (iParentDir>>24)&0xFF;

@@ -3,33 +3,30 @@
 <pre>
 <h1>Erstellungsprotokoll</h1>
 <h3>
---------------------Konfiguration: ETools - Win32 Debug--------------------
+--------------------Konfiguration: ETools - Win32 Release--------------------
 </h3>
 <h3>Befehlszeilen</h3>
-Erstellen der temporären Datei  "d:\Temp\RSP275.tmp" mit Inhalten
+Erstellen der temporären Datei  "d:\Temp\RSP34A.tmp" mit Inhalten
 [
-/nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR"Debug/" /Fp"Debug/ETools.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
-"D:\SVN sourceforge\ensoniqfs\ETools\BackupOptionsDlg.cpp"
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /Fp"Release/ETools.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\SVN sourceforge\ensoniqfs\ETools\EToolsDlg.cpp"
 ]
-Creating command line "cl.exe @d:\Temp\RSP275.tmp" 
-Erstellen der temporären Datei  "d:\Temp\RSP276.tmp" mit Inhalten
+Creating command line "cl.exe @d:\Temp\RSP34A.tmp" 
+Erstellen der temporären Datei  "d:\Temp\RSP34B.tmp" mit Inhalten
 [
-/nologo /subsystem:windows /incremental:yes /pdb:"Debug/ETools.pdb" /debug /machine:I386 /out:"Debug/ETools.exe" /pdbtype:sept 
-".\Debug\BackupOptionsDlg.obj"
-".\Debug\ETools.obj"
-".\Debug\EToolsDlg.obj"
-".\Debug\FormatDlg.obj"
-".\Debug\StdAfx.obj"
-".\Debug\ETools.res"
+/nologo /subsystem:windows /incremental:no /pdb:"Release/ETools.pdb" /machine:I386 /out:"Release/ETools.exe" 
+".\Release\BackupOptionsDlg.obj"
+".\Release\ETools.obj"
+".\Release\EToolsDlg.obj"
+".\Release\FormatDlg.obj"
+".\Release\StdAfx.obj"
+".\Release\ETools.res"
 ]
-Erstellen der Befehlzeile "link.exe @d:\Temp\RSP276.tmp"
+Erstellen der Befehlzeile "link.exe @d:\Temp\RSP34B.tmp"
 <h3>Ausgabefenster</h3>
 Kompilierung läuft...
-BackupOptionsDlg.cpp
+EToolsDlg.cpp
 Linker-Vorgang läuft...
-Erstellen der Befehlzeile "bscmake.exe /nologo /o"Debug/ETools.bsc"  ".\Debug\StdAfx.sbr" ".\Debug\BackupOptionsDlg.sbr" ".\Debug\ETools.sbr" ".\Debug\EToolsDlg.sbr" ".\Debug\FormatDlg.sbr""
-Browse-Informationsdatei wird erstellt...
-<h3>Ausgabefenster</h3>
 
 
 

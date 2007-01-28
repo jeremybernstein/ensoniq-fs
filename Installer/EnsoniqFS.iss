@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=EnsoniqFS
-AppVerName=EnsoniqFS 0.53-BETA
+AppVerName=EnsoniqFS 0.54-BETA
 AppPublisher=Thoralt Franz
 AppPublisherURL=http://sourceforge.net/projects/ensoniqfs/
 AppSupportURL=http://sourceforge.net/projects/ensoniqfs/

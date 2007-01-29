@@ -36,4 +36,5 @@ Name: "{group}\{cm:UninstallProgram,EnsoniqFS}"; Filename: "{uninstallexe}"
 
 [INI]
 Filename: "{win}\wincmd.ini"; Section: "FileSystemPlugins"; Key: "Ensoniq filesystems"; String: "{reg:HKCU\Software\Ghisler\Total Commander,InstallDir|{app}}\plugins\wfx\EnsoniqFS.wfx"; Flags: uninsdeleteentry createkeyifdoesntexist
+Filename: "{win}\fsplugin.ini"; Section: "EnsoniqFS"; Key: "InstallPath"; String: "{app}"; Flags: uninsdeleteentry createkeyifdoesntexist
 

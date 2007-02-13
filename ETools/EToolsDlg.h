@@ -24,6 +24,7 @@ typedef int (__stdcall *tWriteBlocks)(DISK *pDisk, DWORD dwBlock,
 	DWORD dwNumBlocks, unsigned char *ucBuf);
 typedef int (__stdcall *tWriteBlocksUncached)(DISK *pDisk, DWORD dwBlock,
 	DWORD dwNumBlocks, unsigned char *ucBuf);
+typedef int (__stdcall *tGetUsageCount)(void);
 typedef int (__stdcall *tGetFATEntry)(DISK *pDisk, DWORD dwBlock);
 typedef int (__stdcall *tSetFATEntry)(DISK *pDisk, DWORD dwBlock,
 	DWORD dwNewValue);
@@ -47,6 +48,7 @@ public:
 	CEToolsDlg(CWnd* pParent = NULL);	// Standard-Konstruktor
 
 	tFreeDiskList FreeDiskList;
+	tGetUsageCount GetUsageCount;
 	tReadBlocks ReadBlocks;
 	tWriteBlocks WriteBlocks;
 	tWriteBlocksUncached WriteBlocksUncached;

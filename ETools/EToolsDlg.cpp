@@ -185,6 +185,7 @@ BOOL CEToolsDlg::OnInitDialog()
 			this->GetFATEntry = (tGetFATEntry)GetProcAddress(m_hDLL, "GetFATEntry");
 			this->SetFATEntry = (tSetFATEntry)GetProcAddress(m_hDLL, "SetFATEntry");
 			this->CacheFlush = (tCacheFlush)GetProcAddress(m_hDLL, "CacheFlush");
+			this->GetUsageCount = (tGetUsageCount)GetProcAddress(m_hDLL, "GetUsageCount");
 
 			if((NULL==this->ScanDevices) ||
 			   (NULL==this->FreeDiskList) ||
@@ -193,6 +194,7 @@ BOOL CEToolsDlg::OnInitDialog()
 			   (NULL==this->WriteBlocksUncached) ||
 			   (NULL==this->GetFATEntry) ||
 			   (NULL==this->CacheFlush) ||
+			   (NULL==this->GetUsageCount) ||
 			   (NULL==this->SetFATEntry))
 			{
 				MessageBox("Loading of EnsoniqFS.wfx failed (GetProcAddress()).", 
@@ -1547,7 +1549,9 @@ void CEToolsDlg::UpdateDeviceDropdown()
 
 	if(NULL==this->ScanDevices) return;
 	if(NULL==this->FreeDiskList) return;
+	if(NULL==this->GetUsageCount) return;
 
+	// free disk list
 	if(NULL!=m_pDiskList)
 	{
 		LOG("Freeing disk list: ");
@@ -1556,14 +1560,32 @@ void CEToolsDlg::UpdateDeviceDropdown()
 	}
 	m_pDiskList = NULL;
 
+	// check if EnsoniqFS has locked devices
+	if(GetUsageCount()>1)
+	{
+		MessageBox("It seems that you started Ensoniq Filesystem Tools "
+			"from the\nStart menu while Total Commander is using the "
+			"EnsoniqFS\nplugin. Therefore almost all devices containing "
+			"Ensoniq data\nwill be locked by Total Commander and you will "
+			"not be able\nto access them here.\n\n"
+			"To avoid this warning,\n"
+			"(a) quit Total Commander before running Ensoniq Filesystem Tools\n"
+			"  or\n"
+			"(b) call Ensoniq Filesystem Tools from within Total Commander by\n"
+			"navigating to the \"Ensoniq filesystems\" folder and opening the\n"
+			"entry named \"Run Ensoniq Filesystem Tools\".",
+			"Ensoniq Filesystem Tools", MB_ICONEXCLAMATION | MB_OK);
+	}
+
+	// scan for devices
 	LOG("ScanDevices(): ");
 	m_pDiskList = this->ScanDevices(1);
 	LOG("OK, ");
 	if(NULL==m_pDiskList)
 	{
 		LOG("result=NULL.\n");
-		MessageBox("An error occured during device scan.",
-			"Ensoniq Filesystem Tools", MB_ICONEXCLAMATION | MB_OK);
+		MessageBox("An error occured during device scan. No devices were "
+			"found.", "Ensoniq Filesystem Tools", MB_ICONEXCLAMATION | MB_OK);
 		return;
 	}
 	LOG("result!=NULL.\n");
@@ -2081,42 +2103,72 @@ CString CEToolsDlg::SearchRecursive(CString csWhat, CString csWhere)
 CString CEToolsDlg::SearchEnsoniqFsWfx()
 {
 	// TODO: rekursive Suche in TC-Verzeichnis
-	unsigned long ulType, ulDataSize;
-	CString csPath;
-	char cData[260];
+	unsigned long ulType, ulDataSize = 0;
+	CString csPath, csText;
+	char *cData = NULL;
 	HKEY h;
+	DWORD dwError;
+	LONG lReturn;
 
 	// open registry entry
 	if(RegOpenKeyEx(HKEY_CURRENT_USER, 
 		"Software\\Ghisler\\Total Commander", 0, 
 		KEY_QUERY_VALUE, &h)!=ERROR_SUCCESS)
 	{
-		MessageBox("Could not find registry entry for TotalCommander "
+		dwError = GetLastError();
+		csText.Format("Could not open registry entry for TotalCommander "
 			"installation.\n"
-			"Please make sure you have a working copy of TC installed.", 
-			"Ensoniq Filesystem Tools · Warning",
+			"Please make sure you have a working copy of TC installed.\n\n"
+			"Extended error information:\n"
+			"Error code = 0x%08X\nMessage = %s", dwError, 
+			GetErrorText(dwError));
+
+		MessageBox(csText, "Ensoniq Filesystem Tools · Warning",
 			MB_ICONEXCLAMATION | MB_OK);
+		return "";
+	}
+
+	// query buffer length, create buffer
+	lReturn = RegQueryValueEx(h, "InstallDir", 0, &ulType, 
+		(unsigned char*)cData, &ulDataSize);
+
+	cData = new char[ulDataSize+1];
+	if(NULL==cData)
+	{
+		csText.Format("Could not allocate memory (%i bytes) for path "
+			"information.\n", ulDataSize);
+		MessageBox(csText, "Ensoniq Filesystem Tools · Error",
+			MB_ICONSTOP | MB_OK);
 		return "";
 	}
 
 	// read path
-	if(RegQueryValueEx(h, "InstallDir", 0, &ulType, 
-		(unsigned char*)cData, &ulDataSize)!=ERROR_SUCCESS)
+	lReturn = RegQueryValueEx(h, "InstallDir", 0, &ulType, 
+		(unsigned char*)cData, &ulDataSize);
+
+	if(lReturn!=ERROR_SUCCESS)
 	{
-		MessageBox("Could not find registry entry for TotalCommander "
+		csText.Format("Could not query registry entry for TotalCommander "
 			"installation.\n"
-			"Please make sure you have a working copy of TC installed.", 
-			"Ensoniq Filesystem Tools · Warning",
+			"Please make sure you have a working copy of TC installed.\n\n"
+			"Extended error information:\n"
+			"Error code = 0x%08X\nMessage = %s", lReturn, 
+			GetErrorText(lReturn));
+
+		MessageBox(csText, "Ensoniq Filesystem Tools · Warning",
 			MB_ICONEXCLAMATION | MB_OK);
+
+		delete cData;
 		RegCloseKey(h);
 		return "";
 	}
-	RegCloseKey(h);
 
 	csPath = cData;
+	delete cData;
+	RegCloseKey(h);
 
+	// search for EnsoniqFS.wfx in TC installation directory recursively
 	csPath = SearchRecursive("EnsoniqFS.wfx", csPath);
-	//csPath += "\\plugins\\wfx\\EnsoniqFS.wfx";
 
 	return csPath;
 }

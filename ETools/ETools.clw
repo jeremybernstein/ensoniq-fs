@@ -16,11 +16,11 @@ ResourceCount=7
 Resource1=IDD_ABOUTBOX
 Resource2=IDR_MAINFRAME
 Resource3=IDD_ETOOLS_DIALOG
-Resource4=IDD_ABOUTBOX (Englisch (USA))
+Resource4=IDD_DLG_FORMAT
 Resource5=IDD_ETOOLS_DIALOG (Englisch (USA))
 Class4=CFormatDlg
 Class5=CDriveSelect
-Resource6=IDD_DLG_FORMAT
+Resource6=IDD_ABOUTBOX (Englisch (USA))
 Class6=CBackupOptionsDlg
 Resource7=IDD_DLG_BACKUP_OPTIONS
 

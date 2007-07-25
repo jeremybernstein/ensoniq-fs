@@ -149,10 +149,27 @@ BOOL CEToolsDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
 	
 
-	m_csPathToDll = SearchEnsoniqFsWfx();
+
+	char cModuleFilename[MAX_PATH];
+	if(0!=GetModuleFileName(NULL, cModuleFilename, MAX_PATH))
+	{
+		m_csPathToDll = cModuleFilename;
+		m_csPathToDll = m_csPathToDll.Left(m_csPathToDll.GetLength()-10);
+		m_csPathToDll += "ensoniqfs.wfx";
+
+		// if file doesn't exist, try to locate it "manually"
+		if(0!=_access(m_csPathToDll, 0))
+			m_csPathToDll = SearchEnsoniqFsWfx();
+	}
+	else
+	{
+		// try to locate EnsoniqFS.wfx inside the TotalCommander
+		// installation (recursive search)
+		m_csPathToDll = SearchEnsoniqFsWfx();
+	}
+	
 	TRACE("PathToDll=\"%s\"\n", m_csPathToDll);
 
-//	m_csPathToDll = "c:\\EnsoniqFS.wfx";
 	if(""==m_csPathToDll)
 	{
 		MessageBox("Could not find the plugin \"EnsoniqFS.wfx\".\n\n"

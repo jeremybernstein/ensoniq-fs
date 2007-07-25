@@ -6,13 +6,23 @@
 --------------------Konfiguration: ETools - Win32 Release--------------------
 </h3>
 <h3>Befehlszeilen</h3>
-Erstellen der temporären Datei  "d:\Temp\RSP4FF.tmp" mit Inhalten
+Creating command line "rc.exe /l 0x407 /fo"Release/ETools.res" /d "NDEBUG" /d "_AFXDLL" "D:\SVN sourceforge\ensoniqfs\ETools\ETools.rc"" 
+Erstellen der temporären Datei  "d:\Temp\RSP256.tmp" mit Inhalten
 [
 /nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /FR"Release/" /Fp"Release/ETools.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\SVN sourceforge\ensoniqfs\ETools\BackupOptionsDlg.cpp"
+"D:\SVN sourceforge\ensoniqfs\ETools\ETools.cpp"
 "D:\SVN sourceforge\ensoniqfs\ETools\EToolsDlg.cpp"
+"D:\SVN sourceforge\ensoniqfs\ETools\FormatDlg.cpp"
 ]
-Creating command line "cl.exe @d:\Temp\RSP4FF.tmp" 
-Erstellen der temporären Datei  "d:\Temp\RSP500.tmp" mit Inhalten
+Creating command line "cl.exe @d:\Temp\RSP256.tmp" 
+Erstellen der temporären Datei  "d:\Temp\RSP257.tmp" mit Inhalten
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /FR"Release/" /Fp"Release/ETools.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\SVN sourceforge\ensoniqfs\ETools\StdAfx.cpp"
+]
+Creating command line "cl.exe @d:\Temp\RSP257.tmp" 
+Erstellen der temporären Datei  "d:\Temp\RSP258.tmp" mit Inhalten
 [
 /nologo /subsystem:windows /incremental:no /pdb:"Release/ETools.pdb" /machine:I386 /out:"Release/ETools.exe" 
 ".\Release\BackupOptionsDlg.obj"
@@ -22,10 +32,17 @@ Erstellen der temporären Datei  "d:\Temp\RSP500.tmp" mit Inhalten
 ".\Release\StdAfx.obj"
 ".\Release\ETools.res"
 ]
-Erstellen der Befehlzeile "link.exe @d:\Temp\RSP500.tmp"
+Erstellen der Befehlzeile "link.exe @d:\Temp\RSP258.tmp"
 <h3>Ausgabefenster</h3>
+Ressourcen werden kompiliert...
 Kompilierung läuft...
+StdAfx.cpp
+Kompilierung läuft...
+BackupOptionsDlg.cpp
+ETools.cpp
 EToolsDlg.cpp
+FormatDlg.cpp
+Generieren von Code...
 Linker-Vorgang läuft...
 Erstellen der Befehlzeile "bscmake.exe /nologo /o"Release/ETools.bsc"  ".\Release\StdAfx.sbr" ".\Release\BackupOptionsDlg.sbr" ".\Release\ETools.sbr" ".\Release\EToolsDlg.sbr" ".\Release\FormatDlg.sbr""
 Browse-Informationsdatei wird erstellt...

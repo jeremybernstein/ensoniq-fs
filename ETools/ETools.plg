@@ -3,48 +3,39 @@
 <pre>
 <h1>Erstellungsprotokoll</h1>
 <h3>
---------------------Konfiguration: ETools - Win32 Release--------------------
+--------------------Konfiguration: ETools - Win32 Debug--------------------
 </h3>
 <h3>Befehlszeilen</h3>
-Creating command line "rc.exe /l 0x407 /fo"Release/ETools.res" /d "NDEBUG" /d "_AFXDLL" "D:\SVN sourceforge\ensoniqfs\ETools\ETools.rc"" 
-Erstellen der temporären Datei  "d:\Temp\RSP256.tmp" mit Inhalten
+Erstellen der temporären Datei  "d:\Temp\RSP64.tmp" mit Inhalten
 [
-/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /FR"Release/" /Fp"Release/ETools.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+/nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR"Debug/" /Fp"Debug/ETools.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
 "D:\SVN sourceforge\ensoniqfs\ETools\BackupOptionsDlg.cpp"
 "D:\SVN sourceforge\ensoniqfs\ETools\ETools.cpp"
 "D:\SVN sourceforge\ensoniqfs\ETools\EToolsDlg.cpp"
 "D:\SVN sourceforge\ensoniqfs\ETools\FormatDlg.cpp"
 ]
-Creating command line "cl.exe @d:\Temp\RSP256.tmp" 
-Erstellen der temporären Datei  "d:\Temp\RSP257.tmp" mit Inhalten
+Creating command line "cl.exe @d:\Temp\RSP64.tmp" 
+Erstellen der temporären Datei  "d:\Temp\RSP65.tmp" mit Inhalten
 [
-/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_AFXDLL" /FR"Release/" /Fp"Release/ETools.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
-"D:\SVN sourceforge\ensoniqfs\ETools\StdAfx.cpp"
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/ETools.pdb" /debug /machine:I386 /out:"Debug/ETools.exe" /pdbtype:sept 
+".\Debug\BackupOptionsDlg.obj"
+".\Debug\ETools.obj"
+".\Debug\EToolsDlg.obj"
+".\Debug\FormatDlg.obj"
+".\Debug\StdAfx.obj"
+".\Debug\ETools.res"
 ]
-Creating command line "cl.exe @d:\Temp\RSP257.tmp" 
-Erstellen der temporären Datei  "d:\Temp\RSP258.tmp" mit Inhalten
-[
-/nologo /subsystem:windows /incremental:no /pdb:"Release/ETools.pdb" /machine:I386 /out:"Release/ETools.exe" 
-".\Release\BackupOptionsDlg.obj"
-".\Release\ETools.obj"
-".\Release\EToolsDlg.obj"
-".\Release\FormatDlg.obj"
-".\Release\StdAfx.obj"
-".\Release\ETools.res"
-]
-Erstellen der Befehlzeile "link.exe @d:\Temp\RSP258.tmp"
+Erstellen der Befehlzeile "link.exe @d:\Temp\RSP65.tmp"
 <h3>Ausgabefenster</h3>
-Ressourcen werden kompiliert...
 Kompilierung läuft...
-StdAfx.cpp
-Kompilierung läuft...
+EToolsDlg.cpp
+Generieren von Code...
+Ueberspringen... (keine relevanten Aenderungen gefunden)
 BackupOptionsDlg.cpp
 ETools.cpp
-EToolsDlg.cpp
 FormatDlg.cpp
-Generieren von Code...
 Linker-Vorgang läuft...
-Erstellen der Befehlzeile "bscmake.exe /nologo /o"Release/ETools.bsc"  ".\Release\StdAfx.sbr" ".\Release\BackupOptionsDlg.sbr" ".\Release\ETools.sbr" ".\Release\EToolsDlg.sbr" ".\Release\FormatDlg.sbr""
+Erstellen der Befehlzeile "bscmake.exe /nologo /o"Debug/ETools.bsc"  ".\Debug\StdAfx.sbr" ".\Debug\BackupOptionsDlg.sbr" ".\Debug\ETools.sbr" ".\Debug\EToolsDlg.sbr" ".\Debug\FormatDlg.sbr""
 Browse-Informationsdatei wird erstellt...
 <h3>Ausgabefenster</h3>
 

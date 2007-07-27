@@ -112,6 +112,7 @@ protected:
 	afx_msg void OnButtonFormat();
 	afx_msg void OnDropdownComboDevices();
 	afx_msg void OnButtonCancel();
+	afx_msg void OnButtonCreateIso();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

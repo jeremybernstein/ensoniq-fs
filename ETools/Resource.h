@@ -20,6 +20,7 @@
 #define IDC_COMBO_DEVICES               1006
 #define IDC_BUTTON_CANCEL               1007
 #define IDC_EDIT_CAPACITY               1008
+#define IDC_BUTTON_CREATE_ISO           1008
 #define IDC_COMBO_UNIT                  1009
 #define IDC_CHECK_QUICK                 1010
 #define IDC_EDIT_DISK_LABEL             1011

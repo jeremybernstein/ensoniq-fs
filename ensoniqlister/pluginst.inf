@@ -1,0 +1,6 @@
+[plugininstall]
+description=Ensoniq instrument file lister
+type=wlx
+file=EnsoniqLister.wlx
+defaultextension=efe
+defaultdir=EnsoniqLister

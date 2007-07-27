@@ -1,5 +1,43 @@
-// EToolsDlg.cpp : Implementierungsdatei
+// EToolsDlg.cpp
 //
+
+/*
+TODO:
+
+filesystem check:
+- "repair" too small FAT issue by changing logical disk size
+- check every file's FAT chain if it contains a "free" (=0x00) block
+  (must be terminated with EOF (0x01)) and if every part of the chain
+  is within logical disk space
+- check if file size from directory entry is equal to file size from FAT
+- check every directory entry to point to a valid FAT entry (this means
+  =0x01, !=0x00, !=0x02, <=last block on disk)
+- search for cross-linked files, display them, resolve them
+- check "size" argument of every directory (should represent the number
+  of entries contained in this directory)
+- disable buttons during file system check, activate "cancel", check for
+  cancellation
+
+backup/restore:
+- introduce option to create backup from (a) full disk (physical size),
+  (b) full disk (logical partition size), (c) used space only (following
+  FAT -> ISO with size=used space needs to be created)
+
+format:
+- disable buttons during format, activate "cancel", check for cancellation
+- formatting floppy disks using OmniFlop
+- create default directories after formatting
+- copy OS after formatting
+
+general:
+- allow to change disk name
+- create new, empty ISO files
+
+resolved:
+- check if every subdirectory points back to parent
+- find source of exceptions during device scan
+- make backup/restore safe against 2gig/4gig border
+*/
 
 
 #include "stdafx.h"
@@ -113,6 +151,7 @@ BEGIN_MESSAGE_MAP(CEToolsDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_FORMAT, OnButtonFormat)
 	ON_CBN_DROPDOWN(IDC_COMBO_DEVICES, OnDropdownComboDevices)
 	ON_BN_CLICKED(IDC_BUTTON_CANCEL, OnButtonCancel)
+	ON_BN_CLICKED(IDC_BUTTON_CREATE_ISO, OnButtonCreateIso)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -125,9 +164,7 @@ BOOL CEToolsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// Hinzufügen des Menübefehls "Info..." zum Systemmenü.
-
-	// IDM_ABOUTBOX muss sich im Bereich der Systembefehle befinden.
+	// Add "Info..." to system menu
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -143,13 +180,12 @@ BOOL CEToolsDlg::OnInitDialog()
 		}
 	}
 
-	// Symbol für dieses Dialogfeld festlegen. Wird automatisch erledigt
-	//  wenn das Hauptfenster der Anwendung kein Dialogfeld ist
-	SetIcon(m_hIcon, TRUE);			// Großes Symbol verwenden
-	SetIcon(m_hIcon, FALSE);		// Kleines Symbol verwenden
+	// set icon for this dialog
+	SetIcon(m_hIcon, TRUE);			// use big icon
+	SetIcon(m_hIcon, FALSE);		// use small icon
 	
-
-
+	// get the path of the running application, try to load ensoniqfs.wfx
+	// from there
 	char cModuleFilename[MAX_PATH];
 	if(0!=GetModuleFileName(NULL, cModuleFilename, MAX_PATH))
 	{
@@ -194,6 +230,7 @@ BOOL CEToolsDlg::OnInitDialog()
 		}
 		else
 		{
+			// assign DLL functions to the pointers
 			this->ScanDevices = (tScanDevices)GetProcAddress(m_hDLL, "ScanDevices");
 			this->FreeDiskList = (tFreeDiskList)GetProcAddress(m_hDLL, "FreeDiskList");
 			this->ReadBlocks = (tReadBlocks)GetProcAddress(m_hDLL, "ReadBlocks");
@@ -257,11 +294,11 @@ void CEToolsDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // Gerätekontext für Zeichnen
+		CPaintDC dc(this); // get device context
 
 		SendMessage(WM_ICONERASEBKGND, (WPARAM) dc.GetSafeHdc(), 0);
 
-		// Symbol in Client-Rechteck zentrieren
+		// center symbol in client rectangle
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -269,7 +306,7 @@ void CEToolsDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// Symbol zeichnen
+		// draw symbol
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -356,6 +393,7 @@ void CEToolsDlg::OnButtonBackup()
 	}
 	csDevice = csTemp;
 
+	// search currently selected device in the disk list structure
 	pDisk = m_pDiskList;
 	while(pDisk)
 	{
@@ -375,6 +413,7 @@ void CEToolsDlg::OnButtonBackup()
 		return;
 	}
 
+	// show backup options
 	CBackupOptionsDlg *dlg;
 	dlg = new CBackupOptionsDlg();
 	dlg->SetReturnValuePointers(&iBackupFormat, cFN, this, pDisk);
@@ -2248,39 +2287,7 @@ CString CEToolsDlg::CapacityString(int iDiskCapacity)
 	return csDiskSize;
 }
 
-/*
-TODO:
-
-filesystem check:
-- "repair" too small FAT issue by changing logical disk size
-- check every file's FAT chain if it contains a "free" (=0x00) block
-  (must be terminated with EOF (0x01)) and if every part of the chain
-  is within logical disk space
-- check if file size from directory entry is equal to file size from FAT
-- check every directory entry to point to a valid FAT entry (this means
-  =0x01, !=0x00, !=0x02, <=last block on disk)
-- search for cross-linked files, display them, resolve them
-- check "size" argument of every directory (should represent the number
-  of entries contained in this directory)
-- disable buttons during file system check, activate "cancel", check for
-  cancellation
-
-backup/restore:
-- introduce option to create backup from (a) full disk (physical size),
-  (b) full disk (logical partition size), (c) used space only (following
-  FAT -> special backup format needed, ISO not suitable)
-
-format:
-- disable buttons during format, activate "cancel", check for cancellation
-- formatting floppy disks using OmniFlop
-- create default directories after formatting
-- copy OS after formatting
-
-general:
-- allow to change disk name
-
-resolved:
-- check if every subdirectory points back to parent
-- find source of exceptions during device scan
-- make backup/restore safe against 2gig/4gig border
-*/
+void CEToolsDlg::OnButtonCreateIso() 
+{
+	MessageBox("Not yet implemented.");
+}
